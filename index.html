@@ -12,10 +12,52 @@
 <script>
     let val ;
     let i =0 ;
+    // let items = new Array();
     let callPrompt = (text)=>{
       
         let value = prompt("Please Edit the Item ",text);
         return value;
+    }
+    window.onload= function loading (){
+        retrieveItems()
+    }
+    let retrieveItems =()=>{
+        // console.log(localStorage.getItem("item"),typeof(localStorage.getItem("item")))
+        if(localStorage.getItem("list"))
+        {   
+        console.log("Retrieving all the Items ");
+        let values = JSON.parse(localStorage.getItem("list"));
+        console.log(values,typeof(values));
+        values.map((val)=>{
+            let item = document.createElement("div")
+        item.innerText = val
+        item.classList = "item";
+        item.id = "item".concat(i);
+        document.getElementsByClassName("icontainer")[0].append(item)
+        let ele = document.createElement("div");
+        ele.classList =  "ele"
+        ele.id = "ele".concat(i);;
+        let edit = document.createElement("button")
+        edit.innerText = "Edit";
+        edit.classList = "edit";
+        edit.id = "edit".concat(i);
+        edit.addEventListener("click",eclick)
+        let del = document.createElement("button")
+        del.innerText = "Delete";
+        del.classList = "del";
+        del.id = "del".concat(i);
+        del.addEventListener("click",dclick)
+        
+        document.getElementsByClassName("icontainer")[0].append(ele)
+        document.getElementsByClassName("ele")[i].append(edit)
+        document.getElementsByClassName("ele")[i].append(del)
+        i++;
+        })
+
+    }
+    else{
+        return;
+    }
     }
     let eclick = (e)=>{
         
@@ -23,15 +65,27 @@
         num = num[num.length-1];
      
         let element_id = "item".concat(num)
-       
+        
         let element = document.getElementById(element_id)
         let newValue ;
         newValue = callPrompt(element.innerText);
-        element.textContent = newValue
+        let indLocalStorage ;
+        let values = JSON.parse(localStorage.getItem("list"));
+        let curVal = element.innerText
+        values.map((curVal,ind)=>{
+            if(curVal === element.innerText){
+                indLocalStorage  = ind
+            }
+        })
+        values[indLocalStorage]=newValue;
+        localStorage.setItem("list",JSON.stringify(values))
+        
+        element.innerText = newValue
        
     }
     let dclick = (e)=>{
         let num = e.target.id;
+        
         num = num[num.length-1];
      
         let element_id = "item".concat(num)
@@ -39,13 +93,42 @@
         let element = document.getElementById(element_id)
         let change_id = "ele".concat(num);
         let change = document.getElementById(change_id);
+     
+        let indLocalStorage ;
+        let values = JSON.parse(localStorage.getItem("list"));
+        values.map((curVal,ind)=>{
+            if(curVal === element.innerText){
+                indLocalStorage  = ind
+            }
+        })
+        if(values.length>1){
+       values.splice(indLocalStorage,1)
+      
+        localStorage.setItem("list",JSON.stringify(values))
+        }
+        else if (values.length===1){
+            localStorage.setItem("list",JSON.stringify([]))
+        }
+
         element.style.display = "none";
         change.style.display = "none";
     }
     let onClick = ()=>{
        val = document.getElementById("aitem").value ;
+       let tempvalues = localStorage.getItem("list");
+       if(tempvalues===null){
+        values = [];
+       }
+       else{
+        values = JSON.parse(tempvalues);
+       }
+    //    console.log(values);
        if(val.length!=0){
         document.getElementById("aitem").value = null;
+        // items.push(val)
+        values.push(val)
+        localStorage.setItem("list",JSON.stringify(values));
+        
       let item = document.createElement("div")
         item.innerText = val
         item.classList = "item";
@@ -68,7 +151,7 @@
         document.getElementsByClassName("icontainer")[0].append(ele)
         document.getElementsByClassName("ele")[i].append(edit)
         document.getElementsByClassName("ele")[i].append(del)
-
+        
       i++
        }
        else {
